@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+	  <DefineConstants>USE_MEMORY_DB</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\DataBase\Client\SQLClient\" />
+  </ItemGroup>
+
+</Project>
