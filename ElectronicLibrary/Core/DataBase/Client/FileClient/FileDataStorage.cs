@@ -1,37 +1,60 @@
 ﻿using ElectronicLibrary.Core.DataBase.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 #if USE_MEMORY_DB
 
-namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
+namespace ElectronicLibrary.Core.DataBase.Client.FileClient
 {
-    public static class MemoryDataStorage
+    [Serializable]
+    public class FileDataStorage
     {
-        internal static List<LibraryBook> AllBooks { get; private set; }
-        internal static List<LibraryUser> AllUsers { get; private set; }
-        internal static List<BookBorrowed> AllBorrowed { get; private set; }
-        internal static List<BookReturned> AllReturned { get; private set; }
+        public string DBFilePath { get; set; }
+        public FileDataContainer Container { get; protected set; }
+        public List<LibraryBook> AllBooks { get => Container.AllBooks; }
+        public List<LibraryUser> AllUsers { get => Container.AllUsers; }
+        public List<BookBorrowed> AllBorrowed { get => Container.AllBorrowed; }
+        public List<BookReturned> AllReturned { get => Container.AllReturned; }
 
         private static long _currentBookId = 0;
         private static readonly object _bookIdLock = new();
         private static long _currentUserId = 0;
         private static readonly object _userIdLock = new();
-        static MemoryDataStorage()
+        internal FileDataStorage(string dbName)
         {
-            AllBooks = new();
-            AllUsers = new();
-            AllBorrowed = new();
-            AllReturned = new();
+            DBFilePath = dbName;
+            if (!File.Exists(dbName))
+            {
+                File.Create(dbName);
+                Container = new()
+                {
+                    AllBooks = new(),
+                    AllBorrowed = new(),
+                    AllReturned = new(),
+                    AllUsers = new(),
+                };
+                return;
+            }
+            Container = JsonConvert.DeserializeObject<FileDataContainer>(
+                File.ReadAllText(dbName));
         }
 
-        public static LibraryUser GetUserByUsername(string username) =>
+        private void SaveData() =>
+            File.WriteAllText(DBFilePath,
+                JsonConvert.SerializeObject(Container));
+        private void DoAndSave(Action action)
+        {
+            action.Invoke();
+            SaveData();
+        }
+        
+        public LibraryUser GetUserByUsername(string username) =>
             AllUsers.Find(x => x.Username == username);
-        public static LibraryUser GetUserById(long userId) =>
-            AllUsers.Find(x => x.UserId == userId);
 
         /// <summary>
         /// Returns the book with the specified <paramref name="bookId"/>.
@@ -40,10 +63,10 @@ namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
         /// The unique-id of the book.
         /// </param>
         /// <returns></returns>
-        public static LibraryBook GetLibraryBook(long bookId) =>
+        public LibraryBook GetLibraryBook(long bookId) =>
             AllBooks.Find(b => b.BookId == bookId);
 
-        public static BookBorrowed GetBorrowed(long userId, long bookId) =>
+        public BookBorrowed GetBorrowed(long userId, long bookId) =>
             AllBorrowed.Find(b => b.BookId == bookId && b.UserId == userId);
 
         /// <summary>
@@ -52,21 +75,19 @@ namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public static IEnumerable<LibraryBook> GetUsersBook(long userId) =>
+        public IEnumerable<LibraryBook> GetUsersBook(long userId) =>
             AllBorrowed.Where(
                 b => b.UserId == userId && !string.IsNullOrEmpty(b.ReturnEventId))
                 .Select(borrowed => GetLibraryBook(borrowed.BookId));
 
-        public static void AddNewBook(LibraryBook book) =>
-            AllBooks.Add(VerifyModelId(book));
-        public static bool RemoveBook(long bookId) =>
-            AllBooks.Remove(GetLibraryBook(bookId));
-        public static void AddNewUser(LibraryUser user) =>
-            AllUsers.Add(VerifyModelId(user));
-        public static void AddNewBorrowed(BookBorrowed borrowed) =>
-            AllBorrowed.Add(VerifyModelId(borrowed));
-        public static void AddNewReturned(BookReturned returned) =>
-            AllReturned.Add(VerifyModelId(returned));
+        public void AddNewBook(LibraryBook book) =>
+            DoAndSave(() => AllBooks.Add(VerifyModelId(book)));
+        public void AddNewUser(LibraryUser user) =>
+            DoAndSave(() => AllUsers.Add(VerifyModelId(user)));
+        public void AddNewBorrowed(BookBorrowed borrowed) =>
+            DoAndSave(() => AllBorrowed.Add(VerifyModelId(borrowed)));
+        public void AddNewReturned(BookReturned returned) =>
+            DoAndSave(() => AllReturned.Add(VerifyModelId(returned)));
 
         private static LibraryBook VerifyModelId(LibraryBook book)
         {

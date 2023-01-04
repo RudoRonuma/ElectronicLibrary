@@ -21,5 +21,8 @@ namespace ElectronicLibrary.Core.DataBase.Models
         public string Author { get; set; }
 
         public BookGenre Genre { get; set; }
+
+        public override string ToString() =>
+            $"{BookId} - {Title} By {Author}";
     }
 }

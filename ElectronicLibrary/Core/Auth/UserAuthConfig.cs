@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace ElectronicLibrary.Core.Auth
 {
-    public interface IAuthentication
+    public class UserAuthConfig
     {
-        LibraryUser Login(UserAuthConfig config);
-        LibraryUser Register(UserAuthConfig config);
-        LibraryUser RegisterAdmin(UserAuthConfig config);
+        public string Username { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

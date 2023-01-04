@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ElectronicLibrary.Core.DataBase.Models
 {
-    public class LibraryUser
+    public abstract class LibraryUser
     {
         [Key]
-        public long UsertId { get; set; }
+        public long UserId { get; set; }
 
         [MaxLength(45)]
         [MinLength(2)]
@@ -27,5 +27,10 @@ namespace ElectronicLibrary.Core.DataBase.Models
         [MaxLength(64)]
         [MinLength(8)]
         public string Password { get; set; }
+
+        public UserRole Role { get; set; }
+
+        public override string ToString() =>
+            $"{Username} (userId: {UserId})";
     }
 }

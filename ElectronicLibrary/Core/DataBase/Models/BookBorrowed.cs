@@ -34,5 +34,8 @@ namespace ElectronicLibrary.Core.DataBase.Models
         /// The date in which the book was borrowed by user.
         /// </summary>
         public DateTime BorrowedDate { get; set; } = DateTime.Now;
+
+        public override string ToString() =>
+            $"Book:{BookId}; Borrowed by {UserId}";
     }
 }

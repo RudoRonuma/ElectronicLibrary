@@ -3,7 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-	  <DefineConstants>USE_MEMORY_DB</DefineConstants>
+	  <DefineConstants>$(DefineConstants);USE_MEMORY_DB</DefineConstants>
+	  <DefineConstants>$(DefineConstants);USE_CONSOLE_UI</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
