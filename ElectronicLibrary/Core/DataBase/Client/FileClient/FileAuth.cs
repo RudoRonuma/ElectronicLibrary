@@ -10,9 +10,14 @@ namespace ElectronicLibrary.Core.DataBase.Client.FileClient
 {
     internal class FileAuth : IAuthentication
     {
+        private readonly FileDataStorage _storage;
+        internal FileAuth(FileDataStorage storage)
+        {
+            _storage = storage;
+        }
         public LibraryUser Login(UserAuthConfig config)
         {
-            var theUser = FileDataStorage.GetUserByUsername(config.Username);
+            var theUser = _storage.GetUserByUsername(config.Username);
             if (theUser.Password != theUser.Password)
                 throw new InvalidPasswordException();
 
@@ -20,7 +25,7 @@ namespace ElectronicLibrary.Core.DataBase.Client.FileClient
         }
         public LibraryUser Register(UserAuthConfig config)
         {
-            LibraryUser theUser = new()
+            LibraryMember theUser = new()
             {
                 Username = config.Username,
                 Email = config.Email,
@@ -28,14 +33,14 @@ namespace ElectronicLibrary.Core.DataBase.Client.FileClient
                 Name = config.Name,
                 Role = UserRole.NormalUser,
             };
-            FileDataStorage.AddNewUser(theUser);
+            _storage.AddNewUser(theUser);
 
             return theUser;
         }
 
         public LibraryUser RegisterAdmin(UserAuthConfig config)
         {
-            LibraryUser theUser = new()
+            Librarian theUser = new()
             {
                 Username = config.Username,
                 Email = config.Email,
@@ -43,7 +48,7 @@ namespace ElectronicLibrary.Core.DataBase.Client.FileClient
                 Name = config.Name,
                 Role = UserRole.Administrator,
             };
-            FileDataStorage.AddNewUser(theUser);
+            _storage.AddNewUser(theUser);
 
             return theUser;
         }

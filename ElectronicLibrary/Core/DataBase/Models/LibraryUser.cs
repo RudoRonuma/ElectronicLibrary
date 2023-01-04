@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ElectronicLibrary.Core.DataBase.Models
 {
-    public abstract class LibraryUser
+    public class LibraryUser
     {
         [Key]
         public long UserId { get; set; }
@@ -29,6 +29,9 @@ namespace ElectronicLibrary.Core.DataBase.Models
         public string Password { get; set; }
 
         public UserRole Role { get; set; }
+
+        public long PersonnelCode { get; set; }
+
 
         public override string ToString() =>
             $"{Username} (userId: {UserId})";

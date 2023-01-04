@@ -6,8 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
 {
+#if USE_MEMORY_DB
     internal class MemoryAuth : IAuthentication
     {
         public LibraryUser Login(UserAuthConfig config)
@@ -55,4 +57,5 @@ namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
             return theUser;
         }            
     }
+#endif // USE_MEMORY_DB
 }

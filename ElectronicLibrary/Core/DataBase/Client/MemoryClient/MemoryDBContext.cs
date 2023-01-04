@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 #nullable enable
-#if USE_MEMORY_DB
 
 namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
 {
+#if USE_MEMORY_DB
     public class MemoryDBContext : ILibraryRepository, ILibrarianRepository
     {
         public IAuthentication Authentication { get; }
@@ -69,7 +69,7 @@ namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
         public bool UserExists(string username) =>
             MemoryDataStorage.AllUsers.Any(u => u.Username == username);
     }
+#endif // USE_MEMORY_DB
 }
 
-#endif // USE_MEMORY_DB
 

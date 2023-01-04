@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-#if USE_MEMORY_DB
+#if USE_FILE_DB
 
 namespace ElectronicLibrary.Core.DataBase.Client.FileClient
 {
@@ -30,7 +30,7 @@ namespace ElectronicLibrary.Core.DataBase.Client.FileClient
             DBFilePath = dbName;
             if (!File.Exists(dbName))
             {
-                File.Create(dbName);
+                File.Create(dbName).Dispose();
                 Container = new()
                 {
                     AllBooks = new(),
@@ -42,6 +42,14 @@ namespace ElectronicLibrary.Core.DataBase.Client.FileClient
             }
             Container = JsonConvert.DeserializeObject<FileDataContainer>(
                 File.ReadAllText(dbName));
+            Container ??= new()
+            {
+                AllBooks = new(),
+                AllBorrowed = new(),
+                AllReturned = new(),
+                AllUsers = new(),
+            };
+
         }
 
         private void SaveData() =>
@@ -52,9 +60,26 @@ namespace ElectronicLibrary.Core.DataBase.Client.FileClient
             action.Invoke();
             SaveData();
         }
-        
+        private bool DoAndSave(Func<bool> action)
+        {
+            if (action.Invoke())
+            {
+                SaveData();
+                return true;
+            }
+            return false;
+        }
+        //private T DoAndSave<T>(Func<T> action)
+        //{
+        //    var result = action.Invoke();
+        //    SaveData();
+        //    return result;
+        //}
+
         public LibraryUser GetUserByUsername(string username) =>
             AllUsers.Find(x => x.Username == username);
+        public LibraryUser GetUserById(long userId) =>
+            AllUsers.Find(x => x.UserId == userId);
 
         /// <summary>
         /// Returns the book with the specified <paramref name="bookId"/>.
@@ -82,6 +107,8 @@ namespace ElectronicLibrary.Core.DataBase.Client.FileClient
 
         public void AddNewBook(LibraryBook book) =>
             DoAndSave(() => AllBooks.Add(VerifyModelId(book)));
+        public bool RemoveBook(long bookId) =>
+            DoAndSave(() => AllBooks.Remove(GetLibraryBook(bookId)));
         public void AddNewUser(LibraryUser user) =>
             DoAndSave(() => AllUsers.Add(VerifyModelId(user)));
         public void AddNewBorrowed(BookBorrowed borrowed) =>

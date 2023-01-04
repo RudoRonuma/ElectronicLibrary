@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#if USE_MEMORY_DB
 
 namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
 {
+#if USE_MEMORY_DB
     public static class MemoryDataStorage
     {
         internal static List<LibraryBook> AllBooks { get; private set; }
@@ -125,7 +125,7 @@ namespace ElectronicLibrary.Core.DataBase.Client.MemoryClient
             .Replace("=", "")
             .Replace("+", "");
     }
+#endif // USE_MEMORY_DB
 }
 
-#endif // USE_MEMORY_DB
 

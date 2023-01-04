@@ -1,6 +1,7 @@
 ﻿using ElectronicLibrary.UI;
 using ElectronicLibrary.Core.DataBase;
 using ElectronicLibrary.Core.DataBase.Client.MemoryClient;
+using ElectronicLibrary.Core.DataBase.Client.FileClient;
 
 namespace ElectronicLibrary
 {
@@ -21,6 +22,12 @@ namespace ElectronicLibrary
         static ILibrarianRepository GetLibrarianRepository() =>
             _dbCtx;
         private static MemoryDBContext _dbCtx = new();
+#elif USE_FILE_DB
+        static ILibraryRepository GetLibraryRepository() =>
+            _dbCtx;
+        static ILibrarianRepository GetLibrarianRepository() =>
+            _dbCtx;
+        private static readonly FileDBContext _dbCtx = new();
 #endif
 
         static void Main(string[] args)

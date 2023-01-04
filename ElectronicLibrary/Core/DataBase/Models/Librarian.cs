@@ -8,6 +8,5 @@ namespace ElectronicLibrary.Core.DataBase.Models
 {
     public class Librarian : LibraryUser
     {
-        public long PersonnelCode { get; set; }
     }
 }
